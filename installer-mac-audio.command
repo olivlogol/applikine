@@ -65,7 +65,13 @@ from flask import (
     Flask, request, session, redirect, url_for,
     render_template, jsonify, abort, flash, g, send_file,
 )
-from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.security import generate_password_hash as _gen_hash, check_password_hash
+
+
+def generate_password_hash(secret):
+    """Hachage portable. pbkdf2 plutôt que scrypt : certains Python de macOS
+    n'ont pas hashlib.scrypt (compilés sans le scrypt d'OpenSSL)."""
+    return _gen_hash(secret, method="pbkdf2:sha256")
 
 ICI = os.path.dirname(os.path.abspath(__file__))
 DB = os.path.join(ICI, "cabinet.db")
